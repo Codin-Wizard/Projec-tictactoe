@@ -1,30 +1,43 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: bisque;
+}
+
 
 table{
-    margin: 150px auto;
+    margin: 0 auto; 
     border-collapse: collapse;
 
 }
 tr{
     padding: 10px;
     margin: 70px;
+    min-width: 410px;
 }
 td{
     padding: 50px;
     margin: 70px;
-    font-size: 50px;
+    width: 100px;
+    height: 100px;
+    text-align: center;
+    font-size: 4em;
     cursor: pointer;
 }
 td:first-child{
-    border-right:1px solid black;
-    border-bottom: 1px solid black;
+    border-right:3px solid black;
+    border-bottom: 3px solid black;
 }
 td:nth-child(2){
-    border-right:1px solid black;
-    border-bottom: 1px solid black;
-    border-left: 1px solid black;
+    border-right:3px solid black;
+    border-bottom: 3px solid black;
+    border-left: 3px solid black;
 }
 td:last-child{
-    border-bottom: 1px solid black;
+    border-bottom: 3px solid black;
 }
 tr:last-child td{
     border-bottom: 0px solid black;
