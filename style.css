@@ -1,0 +1,11 @@
+body {
+    
+}
+table{
+    margin: 150px auto;
+}
+td{
+    padding: 50px;
+    font-size: 50px;
+    cursor: pointer;
+}
