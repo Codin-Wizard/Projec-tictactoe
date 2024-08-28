@@ -26,20 +26,29 @@ function Gameboard(){
             row.forEach((cell, colIndex) => {
                 const td = document.createElement('td');
                 td.textContent = cell.getValue();
-                
-                td.addEventListener('click', () => {
-                   if( placeMark(rowIndex, colIndex, game.getActivePlayer().mark)){
 
+                const handleClick = () => {
+                    
+                   if( placeMark(rowIndex, colIndex, game.getActivePlayer().mark)){
                         td.textContent = cell.getValue();
 
                         if (game.checkForWin(getFlatBoard())) {
+                            
                             alert(`${game.getActivePlayer().name} won the round`);
+                            
+                            const allCells = document.querySelectorAll('td');
+
+                            allCells.forEach(cell => {
+                                cell.replaceWith(cell.cloneNode(true));
+                            });
+                            
                         } else {
                             game.switchingPlayers();
                         }
                    }
-                })
-
+                }
+                
+                td.addEventListener('click', handleClick);
                 tr.appendChild(td)
             })
             table.appendChild(tr)
