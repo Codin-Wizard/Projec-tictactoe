@@ -19,6 +19,12 @@ function Gameboard(){
     //Dette henter inn brettet
     const getBoard = () => board;
 
+    function showActivePlayer() {
+        const p = document.getElementById('playingText');
+        p.textContent = `${game.getActivePlayer().name}'s turn`;
+
+    }
+
     function renderBoard(board) {
         const table = document.createElement('table');
         board.forEach((row, rowIndex) => {
@@ -32,10 +38,14 @@ function Gameboard(){
                    if( placeMark(rowIndex, colIndex, game.getActivePlayer().mark)){
                         td.textContent = cell.getValue();
 
-                        if (game.checkForWin(getFlatBoard())) {
-                            
+                        const winningCells = game.checkForWin(getFlatBoard());
+
+                        if (winningCells) {
+                    
                             alert(`${game.getActivePlayer().name} won the round`);
                             
+                            drawWinningLine(winningCells);
+
                             const allCells = document.querySelectorAll('td');
 
                             allCells.forEach(cell => {
@@ -55,11 +65,8 @@ function Gameboard(){
         });
         return table;
     }
-    
-
 
     function placeMark(row, column, player) {
-          // Ensure the row and column are within bounds and the cell is available
         const cell = board[row][column];
         return cell.addMark(player);
     }
@@ -74,14 +81,14 @@ function Gameboard(){
     }
 
 
-    return {getBoard, placeMark, printBoard, renderBoard, getFlatBoard};
+    return {getBoard, placeMark, printBoard, renderBoard, getFlatBoard, showActivePlayer};
 }
 
 function Cell() {
-    let value = 0
+    let value = ''
 
     const addMark = (player) => {
-        if (value === 0) {
+        if (value === '') {
             value = player;
             return true;
         }
@@ -114,16 +121,29 @@ function gameController(
 
     const switchingPlayers = () => {
         activePlayer = activePlayer === players[0] ? players[1] : players[0];
+        board.showActivePlayer();
     };
 
     const getActivePlayer = () => activePlayer;
 
     
+    const restartGameButton = document.getElementById('restart');
 
+    restartGameButton.addEventListener('click', () => {
+        const table = document.querySelector('table');
+        if (table) {
+            table.remove();
+        }
+        activePlayer = players[0];
+        
+        const game = gameController();
+        game.playRound();
+    });
     
 
     const playRound = () => {
         document.body.appendChild(board.renderBoard(board.getBoard()));
+        board.showActivePlayer();
     };
 
     const checkForWin = (squares) => {
@@ -141,7 +161,7 @@ function gameController(
         for (let i = 0; i < winLines.length; i++) {
             const [a, b, c] = winLines[i];
             if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-                return squares[a];
+                return winLines[i];
             }
            }
            return null;
@@ -150,6 +170,6 @@ function gameController(
 }
 
 const game = gameController();
-
+  
 game.playRound(); // Start the game
 
