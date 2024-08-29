@@ -41,10 +41,14 @@ function Gameboard(){
                         const winningCells = game.checkForWin(getFlatBoard());
 
                         if (winningCells) {
-                    
-                            alert(`${game.getActivePlayer().name} won the round`);
-                            
-                            drawWinningLine(winningCells);
+                                            
+                            const showWinnerScreen = document.createElement('div');
+
+                            showWinnerScreen.id = 'winnerScreen';
+                            showWinnerScreen.textContent = `${game.getActivePlayer().name} won the round`;
+
+                            table.parentElement.appendChild(showWinnerScreen)
+
 
                             const allCells = document.querySelectorAll('td');
 
@@ -131,11 +135,15 @@ function gameController(
 
     restartGameButton.addEventListener('click', () => {
         const table = document.querySelector('table');
+        const win = document.getElementById('winnerScreen')
         if (table) {
             table.remove();
         }
+        if(win){
+            win.remove();
+        }
         activePlayer = players[0];
-        
+
         const game = gameController();
         game.playRound();
     });
