@@ -25,13 +25,18 @@ body {
     cursor: pointer;
 }
 
-#winnerScreen{
+#winScreen{
     position: fixed;
     background-color: rgba(255, 255, 255, 0.896);
     font-size: 4ch;
     font-weight: 900;
     padding: 100px 50px;
 }
+#winScreen button{
+    
+}
+
+
 #winCounter{
     position: fixed;
     left: 20px;

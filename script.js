@@ -86,11 +86,7 @@ function gameController(
 
             const winningCells = checkForWin(board.getFlatBoard());
             if (winningCells) {
-                const showWinnerScreen = document.createElement('div');
-                showWinnerScreen.id = 'winnerScreen';
-                showWinnerScreen.textContent = `${getActivePlayer().name} won the round`;
-                
-                cellElement.closest('table').parentElement.appendChild(showWinnerScreen);
+                onWinScreen();
 
                 if(getActivePlayer().mark === 'X'){
                     winsPlayerOne++;
@@ -107,6 +103,22 @@ function gameController(
             }
         }
     };
+
+    const onWinScreen = () => {
+        const winScreen = document.createElement('div');
+        winScreen.id = 'winScreen';
+
+        const showWinnerScreen = document.createElement('div');
+        showWinnerScreen.id = 'winner';
+        showWinnerScreen.textContent = `${getActivePlayer().name} won the round`;
+        
+        const newRoundBtn = document.createElement('button');
+        newRoundBtn.id = 'newRoundBtn';
+        newRoundBtn.textContent = 'New Round';
+
+        winScreen.append(showWinnerScreen, newRoundBtn);
+        document.body.append(winScreen);
+    }
 
     const showWinCounter = () => {
         const winCounter = document.createElement('div');
