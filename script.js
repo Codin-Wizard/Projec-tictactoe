@@ -57,7 +57,7 @@ function gameController(
     playerOneName = 'Player One',
     playerTwoName = 'Player Two'
 ) {
-    const board = Gameboard();
+    let board = Gameboard();
 
     let winsPlayerOne = 0, winsPlayerTwo = 0;
 
@@ -104,36 +104,23 @@ function gameController(
         }
     };
 
-    const onWinScreen = () => {
-        const winScreen = document.createElement('div');
-        winScreen.id = 'winScreen';
-
-        const showWinnerScreen = document.createElement('div');
-        showWinnerScreen.id = 'winner';
-        showWinnerScreen.textContent = `${getActivePlayer().name} won the round`;
-        
-        const newRoundBtn = document.createElement('button');
-        newRoundBtn.id = 'newRoundBtn';
-        newRoundBtn.textContent = 'New Round';
-
-        winScreen.append(showWinnerScreen, newRoundBtn);
-        document.body.append(winScreen);
-    }
-
     const showWinCounter = () => {
-        const winCounter = document.createElement('div');
-        winCounter.id = 'winCounter'
+        let winCounter = document.getElementById('winCounter');
+       
+        if(!winCounter){
+            winCounter = document.createElement('div');
+            winCounter.id = 'winCounter';
+            const showWinsPlayerOne = document.createElement('div');
+            const showWinsPlayerTwo = document.createElement('div');
 
-        const showWinsPlayerOne = document.createElement('div');
-        const showWinsPlayerTwo = document.createElement('div');
+            showWinsPlayerOne.id = 'winsPlayerOne';
+            showWinsPlayerTwo.id = 'winsPlayerTwo';
 
-        showWinsPlayerOne.id = 'winsPlayerOne';
-        showWinsPlayerTwo.id = 'winsPlayerTwo';
-
-        updateWinCounter();
-        
-        winCounter.append(showWinsPlayerOne, showWinsPlayerTwo);
-        document.body.appendChild(winCounter);
+            updateWinCounter();
+            
+            winCounter.append(showWinsPlayerOne, showWinsPlayerTwo);
+            document.body.appendChild(winCounter);
+        }
     }
 
     const  updateWinCounter = () => {
@@ -164,17 +151,40 @@ function gameController(
         }
         return null;
     };
+ 
+    const onWinScreen = () => {
+        const winScreen = document.createElement('div');
+        winScreen.id = 'winScreen';
 
-    const playRound = () => {
-        document.body.appendChild(board.renderBoard(board.getBoard(), handleClick));
-        showActivePlayer();
-        showWinCounter();
-    };
+        const showWinnerScreen = document.createElement('div');
+        showWinnerScreen.id = 'winner';
+        showWinnerScreen.textContent = `${getActivePlayer().name} won the round`;
+        
+        const newRoundBtn = document.createElement('button');
+        newRoundBtn.id = 'newRoundBtn';
+        newRoundBtn.textContent = 'New Round';
+
+        newRoundBtn.addEventListener('click', () => {
+            const table = document.querySelector('table');
+            const win = document.getElementById('winScreen');
+            if (table) table.remove();
+            if (win) win.remove();
+
+            activePlayer = players[0];
+
+            board = Gameboard();
+
+            playRound()
+        });
+
+        winScreen.append(showWinnerScreen, newRoundBtn);
+        document.body.append(winScreen);
+    }
 
     const restartGameButton = document.getElementById('restart');
     restartGameButton.addEventListener('click', () => {
         const table = document.querySelector('table');
-        const win = document.getElementById('winnerScreen');
+        const win = document.getElementById('winScreen');
         if (table) table.remove();
         if (win) win.remove();
 
@@ -182,6 +192,12 @@ function gameController(
         const game = gameController();
         game.playRound();
     });
+
+    const playRound = () => {
+        document.body.appendChild(board.renderBoard(board.getBoard(), handleClick));
+        showActivePlayer();
+        showWinCounter();
+    };
 
     return { playRound };
 }
