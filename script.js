@@ -1,95 +1,43 @@
-/* Denne funksjonen kal lage brettet */
-
-function Gameboard(){
+// Gameboard creation and rendering
+function Gameboard() {
     const rows = 3;
     const columns = 3;
-    const board = Array.from({ length: rows }, () => 
+    const board = Array.from({ length: rows }, () =>
         Array.from({ length: columns }, () => Cell())
     );
 
-    //Lager en 2d array som skal representere brettet
-    // for (let i = 0; i < rows; i++) {
-    //     board[i] = [];
-    //     for (let j = 0; j < columns; j++) {
-    //         board[i].push(Cell());
-            
-    //     }
-    // }
-
-    //Dette henter inn brettet
     const getBoard = () => board;
 
-    function showActivePlayer() {
-        const p = document.getElementById('playingText');
-        p.textContent = `${game.getActivePlayer().name}'s turn`;
-
-    }
-
-    function renderBoard(board) {
+    function renderBoard(board, handleClick) {
         const table = document.createElement('table');
         board.forEach((row, rowIndex) => {
             const tr = document.createElement('tr');
             row.forEach((cell, colIndex) => {
                 const td = document.createElement('td');
                 td.textContent = cell.getValue();
-
-                const handleClick = () => {
-                    
-                   if( placeMark(rowIndex, colIndex, game.getActivePlayer().mark)){
-                        td.textContent = cell.getValue();
-
-                        const winningCells = game.checkForWin(getFlatBoard());
-
-                        if (winningCells) {
-                                            
-                            const showWinnerScreen = document.createElement('div');
-
-                            showWinnerScreen.id = 'winnerScreen';
-                            showWinnerScreen.textContent = `${game.getActivePlayer().name} won the round`;
-
-                            table.parentElement.appendChild(showWinnerScreen)
-
-
-                            const allCells = document.querySelectorAll('td');
-
-                            allCells.forEach(cell => {
-                                cell.replaceWith(cell.cloneNode(true));
-                            });
-                            
-                        } else {
-                            game.switchingPlayers();
-                        }
-                   }
-                }
                 
-                td.addEventListener('click', handleClick);
-                tr.appendChild(td)
-            })
-            table.appendChild(tr)
+                td.addEventListener('click', () => handleClick(rowIndex, colIndex, td));
+                tr.appendChild(td);
+            });
+            table.appendChild(tr);
         });
         return table;
     }
 
-    function placeMark(row, column, player) {
-        const cell = board[row][column];
-        return cell.addMark(player);
-    }
-    
-
     function getFlatBoard() {
-        return board.flat().map(cell => cell.getValue())
+        return board.flat().map(cell => cell.getValue());
     }
 
     function printBoard() {
-        return board.map((row) => row.map((cell) => cell.getValue()))
+        return board.map((row) => row.map((cell) => cell.getValue()));
     }
 
-
-    return {getBoard, placeMark, printBoard, renderBoard, getFlatBoard, showActivePlayer};
+    return { getBoard, renderBoard, getFlatBoard, printBoard  };
 }
 
+// Cell logic
 function Cell() {
-    let value = ''
+    let value = '';
 
     const addMark = (player) => {
         if (value === '') {
@@ -101,9 +49,10 @@ function Cell() {
 
     const getValue = () => value;
 
-    return {addMark, getValue}
+    return { addMark, getValue };
 }
 
+// Game logic
 function gameController(
     playerOneName = 'Player One',
     playerTwoName = 'Player Two'
@@ -111,73 +60,116 @@ function gameController(
     const board = Gameboard();
 
     const players = [
-        {
-            name: playerOneName,
-            mark: 'X'
-        },
-        {
-            name: playerTwoName,
-            mark: 'O'
-        }
+        { name: playerOneName, mark: 'X' },
+        { name: playerTwoName, mark: 'O' }
     ];
 
     let activePlayer = players[0];
 
     const switchingPlayers = () => {
         activePlayer = activePlayer === players[0] ? players[1] : players[0];
-        board.showActivePlayer();
+        showActivePlayer();
     };
 
     const getActivePlayer = () => activePlayer;
 
-    
-    const restartGameButton = document.getElementById('restart');
-
-    restartGameButton.addEventListener('click', () => {
-        const table = document.querySelector('table');
-        const win = document.getElementById('winnerScreen')
-        if (table) {
-            table.remove();
-        }
-        if(win){
-            win.remove();
-        }
-        activePlayer = players[0];
-
-        const game = gameController();
-        game.playRound();
-    });
-    
-
-    const playRound = () => {
-        document.body.appendChild(board.renderBoard(board.getBoard()));
-        board.showActivePlayer();
+    const showActivePlayer = () => {
+        const p = document.getElementById('playingText');
+        p.textContent = `${getActivePlayer().name}'s turn`;
     };
+
+    const handleClick = (rowIndex, colIndex, cellElement) => {
+        if (board.getBoard()[rowIndex][colIndex].addMark(getActivePlayer().mark)) {
+            cellElement.textContent = board.getBoard()[rowIndex][colIndex].getValue();
+
+            const winningCells = checkForWin(board.getFlatBoard());
+            if (winningCells) {
+                const showWinnerScreen = document.createElement('div');
+                showWinnerScreen.id = 'winnerScreen';
+                showWinnerScreen.textContent = `${getActivePlayer().name} won the round`;
+                
+                cellElement.closest('table').parentElement.appendChild(showWinnerScreen);
+
+                if(getActivePlayer().mark === 'X'){
+                    winsPlayerOne++;
+                }else{
+                    winsPlayerTwo++;
+                }
+
+                updateWinCounter();
+
+                const allCells = document.querySelectorAll('td');
+                allCells.forEach(cell => cell.replaceWith(cell.cloneNode(true)));
+            } else {
+                switchingPlayers();
+            }
+        }
+    };
+
+    const showWinCounter = () => {
+        const winCounter = document.createElement('div');
+        winCounter.id = 'winCounter'
+
+        const showWinsPlayerOne = document.createElement('div');
+        const showWinsPlayerTwo = document.createElement('div');
+
+        showWinsPlayerOne.id = 'winsPlayerOne';
+        showWinsPlayerTwo.id = 'winsPlayerTwo';
+
+        updateWinCounter();
+        
+        winCounter.append(showWinsPlayerOne, showWinsPlayerTwo);
+        document.body.appendChild(winCounter);
+    }
+
+    const  updateWinCounter = () => {
+        const showWinsPlayerOne = document.getElementById('winsPlayerOne');
+        const showWinsPlayerTwo = document.getElementById('winsPlayerTwo');
+
+        if (showWinsPlayerOne) {
+            showWinsPlayerOne.textContent = `${playerOneName} Wins: ${winsPlayerOne}`;
+        }
+        if (showWinsPlayerTwo) {
+            showWinsPlayerTwo.textContent = `${playerTwoName} Wins: ${winsPlayerTwo}`;
+        }
+    }
 
     const checkForWin = (squares) => {
         const winLines = [
-            [0, 1, 2],
-            [3, 4, 5],
-            [6, 7, 8],
-            [0, 3, 6],
-            [1, 4, 7],
-            [2, 5, 8],
-            [0, 4, 8],
-            [2, 4, 6]
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],
+            [0, 4, 8], [2, 4, 6]
         ];
-        
+
         for (let i = 0; i < winLines.length; i++) {
             const [a, b, c] = winLines[i];
             if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
                 return winLines[i];
             }
-           }
-           return null;
         }
-    return { playRound, getActivePlayer, checkForWin, switchingPlayers };
+        return null;
+    };
+
+    const playRound = () => {
+        document.body.appendChild(board.renderBoard(board.getBoard(), handleClick));
+        showActivePlayer();
+        showWinCounter();
+    };
+
+    const restartGameButton = document.getElementById('restart');
+    restartGameButton.addEventListener('click', () => {
+        const table = document.querySelector('table');
+        const win = document.getElementById('winnerScreen');
+        if (table) table.remove();
+        if (win) win.remove();
+
+        activePlayer = players[0];
+        const game = gameController();
+        game.playRound();
+    });
+
+    return { playRound };
 }
 
 const game = gameController();
-  
 game.playRound(); // Start the game
-
