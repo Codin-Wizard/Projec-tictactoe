@@ -59,6 +59,8 @@ function gameController(
 ) {
     const board = Gameboard();
 
+    let winsPlayerOne = 0, winsPlayerTwo = 0;
+
     const players = [
         { name: playerOneName, mark: 'X' },
         { name: playerTwoName, mark: 'O' }
@@ -132,6 +134,7 @@ function gameController(
         if (showWinsPlayerTwo) {
             showWinsPlayerTwo.textContent = `${playerTwoName} Wins: ${winsPlayerTwo}`;
         }
+        console.log(winsPlayerOne);
     }
 
     const checkForWin = (squares) => {
