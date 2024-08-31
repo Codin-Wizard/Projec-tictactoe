@@ -189,8 +189,16 @@ function gameController(
         if (win) win.remove();
 
         activePlayer = players[0];
-        const game = gameController();
-        game.playRound();
+
+        winsPlayerOne = 0;
+        winsPlayerTwo = 0;
+    
+        // Reset the win counter display
+        updateWinCounter();
+
+        board = Gameboard();
+
+        playRound()
     });
 
     const playRound = () => {
